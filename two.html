@@ -1,0 +1,1506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SportsTalent India - AI-Powered Sports Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'saffron': '#FF9933',
+                        'white': '#FFFFFF',
+                        'green': '#138808'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #FF9933 0%, #FFFFFF 50%, #138808 100%);
+        }
+        .sport-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .sport-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .progress-bar {
+            transition: width 0.3s ease;
+        }
+        .leaderboard-item {
+            animation: slideIn 0.5s ease forwards;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="gradient-bg shadow-lg">
+        <div class="container mx-auto px-4 py-6">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <div class="text-4xl">🏆</div>
+                    <div>
+                        <h1 class="text-3xl font-bold text-white">SportsTalent India</h1>
+                        <p class="text-white/90">AI-Powered Sports Talent Discovery Platform</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button class="bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-700 transition-colors">Login</button>
+                    <button class="bg-green-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-green-700 transition-colors">Sign Up</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <!-- Landing Page -->
+        <div id="landingPage" class="space-y-8">
+            <div class="text-center space-y-4">
+                <h2 class="text-4xl font-bold text-gray-800">Discover Your Sports Talent</h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                    Upload videos, test your mental strength, and showcase your certificates. 
+                    Our AI analyzes your performance across 20 Indian sports to help you reach your potential.
+                </p>
+                
+                <!-- Quick Access Buttons -->
+                <div class="flex justify-center space-x-4 mt-8">
+                    <button onclick="viewLeaderboard()" class="bg-purple-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-purple-700 transition-colors flex items-center space-x-2">
+                        <span>🏆</span>
+                        <span>View Leaderboard</span>
+                    </button>
+                    <button onclick="viewMyReports()" class="bg-orange-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-orange-700 transition-colors flex items-center space-x-2">
+                        <span>📊</span>
+                        <span>My Reports</span>
+                    </button>
+                    <button onclick="shareApp()" class="bg-cyan-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-cyan-700 transition-colors flex items-center space-x-2">
+                        <span>📱</span>
+                        <span>Share App</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Sports Grid -->
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
+                <!-- Sports Cards will be generated here -->
+            </div>
+        </div>
+
+        <!-- Sport Analysis Page -->
+        <div id="sportPage" class="hidden space-y-8">
+            <div class="flex items-center space-x-4 mb-8">
+                <button onclick="showLanding()" class="text-blue-600 hover:text-blue-800 flex items-center space-x-2">
+                    <span>←</span>
+                    <span>Back to Sports</span>
+                </button>
+                <div class="flex items-center space-x-4">
+                    <div id="selectedSportIcon" class="text-4xl"></div>
+                    <div>
+                        <h2 id="selectedSportName" class="text-3xl font-bold text-gray-800"></h2>
+                        <p class="text-gray-600">Complete all three assessments for comprehensive analysis</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="bg-gray-200 rounded-full h-3 mb-8">
+                <div id="progressBar" class="progress-bar bg-gradient-to-r from-saffron to-green h-3 rounded-full" style="width: 0%"></div>
+            </div>
+
+            <!-- Assessment Options -->
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Physical Analysis -->
+                <div class="bg-white rounded-xl shadow-lg p-6 border-2 border-transparent hover:border-blue-500 transition-colors">
+                    <div class="text-center space-y-4">
+                        <div class="text-5xl">📹</div>
+                        <h3 class="text-xl font-bold text-gray-800">Physical Analysis</h3>
+                        <p class="text-gray-600">Upload or record your performance video for AI-powered biomechanical analysis</p>
+                        <div class="space-y-2">
+                            <div class="text-sm text-gray-500">Analyzes:</div>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">Speed</span>
+                                <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">Stamina</span>
+                                <span class="bg-purple-100 text-purple-800 px-2 py-1 rounded text-xs">Agility</span>
+                                <span class="bg-orange-100 text-orange-800 px-2 py-1 rounded text-xs">Posture</span>
+                                <span class="bg-red-100 text-red-800 px-2 py-1 rounded text-xs">Strength</span>
+                            </div>
+                        </div>
+                        <button onclick="openVideoModal()" class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors">
+                            Start Video Analysis
+                        </button>
+                        <div id="physicalStatus" class="text-sm text-gray-500">Not completed</div>
+                    </div>
+                </div>
+
+                <!-- Mental Strength -->
+                <div class="bg-white rounded-xl shadow-lg p-6 border-2 border-transparent hover:border-purple-500 transition-colors">
+                    <div class="text-center space-y-4">
+                        <div class="text-5xl">🧠</div>
+                        <h3 class="text-xl font-bold text-gray-800">Mental Strength</h3>
+                        <p class="text-gray-600">Test your reaction time and sports psychology knowledge</p>
+                        <div class="space-y-2">
+                            <div class="text-sm text-gray-500">Includes:</div>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs">Reaction Test (40%)</span>
+                                <span class="bg-indigo-100 text-indigo-800 px-2 py-1 rounded text-xs">Psychology Quiz (60%)</span>
+                            </div>
+                        </div>
+                        <button onclick="openMentalModal()" class="w-full bg-purple-600 text-white py-3 rounded-lg font-semibold hover:bg-purple-700 transition-colors">
+                            Start Mental Test
+                        </button>
+                        <div id="mentalStatus" class="text-sm text-gray-500">Not completed</div>
+                    </div>
+                </div>
+
+                <!-- Certificate Verification -->
+                <div class="bg-white rounded-xl shadow-lg p-6 border-2 border-transparent hover:border-green-500 transition-colors">
+                    <div class="text-center space-y-4">
+                        <div class="text-5xl">🏅</div>
+                        <h3 class="text-xl font-bold text-gray-800">Certificate Upload</h3>
+                        <p class="text-gray-600">Upload your sports certificates for verification and scoring</p>
+                        <div class="space-y-2">
+                            <div class="text-sm text-gray-500">Scoring:</div>
+                            <div class="text-xs space-y-1">
+                                <div>National: 100 pts</div>
+                                <div>State: 70 pts</div>
+                                <div>Division: 50 pts</div>
+                                <div>District: 30 pts</div>
+                                <div class="text-green-600">+10% for multiple certificates</div>
+                            </div>
+                        </div>
+                        <button onclick="openCertificateModal()" class="w-full bg-orange-600 text-white py-3 rounded-lg font-semibold hover:bg-orange-700 transition-colors">
+                            Upload Certificates
+                        </button>
+                        <div id="certificateStatus" class="text-sm text-gray-500">Not completed</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results Section -->
+            <div id="resultsSection" class="hidden bg-white rounded-xl shadow-lg p-8">
+                <h3 class="text-2xl font-bold text-gray-800 mb-6 text-center">Your Sports Talent Analysis</h3>
+                <div id="resultsContent"></div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Video Upload Modal -->
+    <div id="videoModal" class="modal">
+        <div class="bg-white rounded-xl p-8 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-gray-800">Physical Analysis - Video Upload</h3>
+                <button onclick="closeModal('videoModal')" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+            </div>
+            
+            <div class="space-y-6">
+                <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+                    <div class="text-4xl mb-4">📹</div>
+                    <p class="text-gray-600 mb-4">Upload your performance video (MP4, MOV, WEBM)</p>
+                    <input type="file" id="videoFile" accept=".mp4,.mov,.webm" class="hidden" onchange="handleVideoUpload(event)">
+                    <button onclick="document.getElementById('videoFile').click()" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors">
+                        Choose Video File
+                    </button>
+                    <p class="text-sm text-gray-500 mt-2">Or</p>
+                    <button onclick="startVideoCapture()" class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors">
+                        Record New Video
+                    </button>
+                </div>
+                
+                <div id="videoPreview" class="hidden">
+                    <video id="previewVideo" controls class="w-full rounded-lg"></video>
+                    <button onclick="analyzeVideo()" class="w-full mt-4 bg-saffron text-white py-3 rounded-lg font-semibold hover:bg-orange-600 transition-colors">
+                        Analyze Video with AI
+                    </button>
+                </div>
+                
+                <div id="videoAnalysis" class="hidden space-y-4">
+                    <div class="text-center">
+                        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                        <p class="text-gray-600">Analyzing your performance with AI...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mental Test Modal -->
+    <div id="mentalModal" class="modal">
+        <div class="bg-white rounded-xl p-8 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-gray-800">Mental Strength Assessment</h3>
+                <button onclick="closeModal('mentalModal')" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+            </div>
+            
+            <div id="mentalTestContent">
+                <!-- Reaction Test -->
+                <div id="reactionTest" class="space-y-6">
+                    <div class="text-center">
+                        <h4 class="text-xl font-semibold mb-4">Reaction Time Test</h4>
+                        <p class="text-gray-600 mb-6">Click the button as soon as it turns green!</p>
+                        <div id="reactionButton" class="w-32 h-32 bg-red-500 rounded-full mx-auto cursor-pointer flex items-center justify-center text-white font-bold text-lg transition-colors" onclick="handleReactionClick()">
+                            WAIT
+                        </div>
+                        <div id="reactionResult" class="mt-4 text-lg font-semibold"></div>
+                        <button id="startReactionTest" onclick="startReactionTest()" class="mt-4 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors">
+                            Start Test
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Psychology Quiz -->
+                <div id="psychologyQuiz" class="hidden space-y-6">
+                    <div class="text-center mb-6">
+                        <h4 class="text-xl font-semibold">Sports Psychology Quiz</h4>
+                        <p class="text-gray-600">Answer these questions about mental aspects of sports</p>
+                    </div>
+                    <div id="quizContent"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Certificate Upload Modal -->
+    <div id="certificateModal" class="modal">
+        <div class="bg-white rounded-xl p-8 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-gray-800">Certificate Verification & Upload</h3>
+                <button onclick="closeModal('certificateModal')" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+            </div>
+            
+            <div class="grid lg:grid-cols-2 gap-8">
+                <!-- Upload Section -->
+                <div class="space-y-6">
+                    <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-green-500 transition-colors" 
+                         ondrop="handleDrop(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
+                        <div class="text-4xl mb-4">🏅</div>
+                        <p class="text-gray-600 mb-4">Drag & drop certificates here or click to browse</p>
+                        <p class="text-sm text-gray-500 mb-4">Supports: JPG, PNG, PDF (Max 10MB each)</p>
+                        <input type="file" id="certificateFile" accept=".jpg,.jpeg,.png,.pdf" multiple class="hidden" onchange="handleCertificateUpload(event)">
+                        <button onclick="document.getElementById('certificateFile').click()" class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors">
+                            📁 Browse Files
+                        </button>
+                        <div class="mt-4">
+                            <button onclick="captureWithCamera()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm">
+                                📷 Take Photo
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Quick Upload Templates -->
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <h5 class="font-semibold text-gray-800 mb-3">Quick Templates</h5>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button onclick="setQuickTemplate('national')" class="text-left p-2 bg-yellow-100 rounded border hover:bg-yellow-200 transition-colors">
+                                <div class="text-sm font-medium">🏆 National Level</div>
+                                <div class="text-xs text-gray-600">100 points</div>
+                            </button>
+                            <button onclick="setQuickTemplate('state')" class="text-left p-2 bg-blue-100 rounded border hover:bg-blue-200 transition-colors">
+                                <div class="text-sm font-medium">🥇 State Level</div>
+                                <div class="text-xs text-gray-600">70 points</div>
+                            </button>
+                            <button onclick="setQuickTemplate('division')" class="text-left p-2 bg-green-100 rounded border hover:bg-green-200 transition-colors">
+                                <div class="text-sm font-medium">🥈 Division Level</div>
+                                <div class="text-xs text-gray-600">50 points</div>
+                            </button>
+                            <button onclick="setQuickTemplate('district')" class="text-left p-2 bg-purple-100 rounded border hover:bg-purple-200 transition-colors">
+                                <div class="text-sm font-medium">🥉 District Level</div>
+                                <div class="text-xs text-gray-600">30 points</div>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Preview & Details Section -->
+                <div class="space-y-6">
+                    <div class="space-y-4">
+                        <h4 class="font-semibold text-gray-800">Certificate Details</h4>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Competition Level *</label>
+                                <select id="certificateLevel" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                                    <option value="">Select Level</option>
+                                    <option value="national">🏆 National (100 pts)</option>
+                                    <option value="state">🥇 State (70 pts)</option>
+                                    <option value="division">🥈 Division (50 pts)</option>
+                                    <option value="district">🥉 District (30 pts)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Year *</label>
+                                <input type="number" id="certificateYear" min="2000" max="2024" value="2024" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Position/Rank</label>
+                                <select id="certificatePosition" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                                    <option value="">Select Position</option>
+                                    <option value="1st">🥇 1st Place (+10%)</option>
+                                    <option value="2nd">🥈 2nd Place (+7%)</option>
+                                    <option value="3rd">🥉 3rd Place (+5%)</option>
+                                    <option value="participation">🏅 Participation</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Sport Category</label>
+                                <select id="certificateSport" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                                    <option value="">Select Sport</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Organizing Body *</label>
+                            <input type="text" id="certificateOrg" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent" placeholder="e.g., Sports Authority of India, BCCI, Hockey India">
+                        </div>
+                    </div>
+                    
+                    <!-- Uploaded Files Preview -->
+                    <div id="certificatePreview" class="hidden">
+                        <h4 class="font-semibold text-gray-800 mb-3 flex items-center">
+                            <span>📋 Uploaded Certificates</span>
+                            <span id="fileCount" class="ml-2 bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs"></span>
+                        </h4>
+                        <div id="certificateList" class="space-y-3 max-h-60 overflow-y-auto"></div>
+                        
+                        <!-- Score Preview -->
+                        <div id="scorePreview" class="bg-blue-50 p-4 rounded-lg mt-4">
+                            <h5 class="font-semibold text-blue-800 mb-2">Estimated Score</h5>
+                            <div id="scoreBreakdown" class="text-sm space-y-1"></div>
+                        </div>
+                        
+                        <button onclick="verifyCertificates()" id="verifyBtn" class="w-full mt-4 bg-saffron text-white py-3 rounded-lg font-semibold hover:bg-orange-600 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed">
+                            🔍 Verify & Process Certificates
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Processing Status -->
+            <div id="processingStatus" class="hidden mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <div class="flex items-center space-x-3">
+                    <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-yellow-600"></div>
+                    <div>
+                        <div class="font-semibold text-yellow-800">Processing Certificates...</div>
+                        <div class="text-sm text-yellow-600">OCR scanning and verification in progress</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leaderboard Modal -->
+    <div id="leaderboardModal" class="modal">
+        <div class="bg-white rounded-xl p-8 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-gray-800">Leaderboard</h3>
+                <button onclick="closeModal('leaderboardModal')" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+            </div>
+            
+            <div class="space-y-6">
+                <div class="flex space-x-4">
+                    <select id="leaderboardSport" class="border border-gray-300 rounded-lg px-3 py-2">
+                        <option value="all">All Sports</option>
+                    </select>
+                    <select id="leaderboardRegion" class="border border-gray-300 rounded-lg px-3 py-2">
+                        <option value="national">National</option>
+                        <option value="state">State</option>
+                        <option value="district">District</option>
+                    </select>
+                    <button onclick="updateLeaderboard()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                        Update
+                    </button>
+                </div>
+                
+                <div id="leaderboardContent" class="space-y-4">
+                    <!-- Leaderboard entries will be populated here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sports data with Indian sports
+        const sportsData = [
+            { name: 'Athletics', icon: '🏃‍♂️', color: 'bg-red-500', description: 'Track and field events' },
+            { name: 'Cricket', icon: '🏏', color: 'bg-blue-500', description: 'India\'s most popular sport' },
+            { name: 'Hockey', icon: '🏑', color: 'bg-blue-500', description: 'National sport of India' },
+            { name: 'Football', icon: '⚽', color: 'bg-orange-500', description: 'The beautiful game' },
+            { name: 'Kabaddi', icon: '🤼‍♂️', color: 'bg-purple-500', description: 'Traditional Indian sport' },
+            { name: 'Kho-Kho', icon: '🏃‍♀️', color: 'bg-pink-500', description: 'Ancient Indian tag game' },
+            { name: 'Badminton', icon: '🏸', color: 'bg-yellow-500', description: 'Racquet sport' },
+            { name: 'Wrestling', icon: '🤼', color: 'bg-indigo-500', description: 'Combat sport' },
+            { name: 'Boxing', icon: '🥊', color: 'bg-red-600', description: 'Pugilistic sport' },
+            { name: 'Weightlifting', icon: '🏋️‍♂️', color: 'bg-gray-600', description: 'Strength sport' },
+            { name: 'Tennis', icon: '🎾', color: 'bg-pink-500', description: 'Racquet sport' },
+            { name: 'Volleyball', icon: '🏐', color: 'bg-blue-600', description: 'Team sport' },
+            { name: 'Basketball', icon: '🏀', color: 'bg-orange-600', description: 'Court sport' },
+            { name: 'Handball', icon: '🤾‍♂️', color: 'bg-teal-500', description: 'Team ball sport' },
+            { name: 'Cycling', icon: '🚴‍♂️', color: 'bg-cyan-500', description: 'Bicycle racing' },
+            { name: 'Archery', icon: '🏹', color: 'bg-amber-600', description: 'Bow and arrow sport' },
+            { name: 'Shooting', icon: '🎯', color: 'bg-slate-600', description: 'Target shooting' },
+            { name: 'Rowing', icon: '🚣‍♂️', color: 'bg-blue-700', description: 'Water sport' },
+            { name: 'Swimming', icon: '🏊‍♂️', color: 'bg-cyan-600', description: 'Aquatic sport' },
+            { name: 'Polo', icon: '🐎', color: 'bg-emerald-600', description: 'Equestrian sport' }
+        ];
+
+        // Global variables
+        let currentSport = null;
+        let assessmentScores = {
+            physical: null,
+            mental: null,
+            certificate: null
+        };
+        let reactionStartTime = null;
+        let reactionTimeout = null;
+        let currentQuizQuestion = 0;
+        let quizAnswers = [];
+
+        // Quiz questions for sports psychology
+        const quizQuestions = [
+            {
+                question: "What is the most important mental skill for peak athletic performance?",
+                options: ["Confidence", "Focus", "Motivation", "Relaxation"],
+                correct: 1
+            },
+            {
+                question: "How should an athlete handle pre-competition anxiety?",
+                options: ["Ignore it completely", "Use breathing techniques", "Avoid thinking about it", "Increase training intensity"],
+                correct: 1
+            },
+            {
+                question: "What is visualization in sports psychology?",
+                options: ["Watching game videos", "Mental rehearsal of performance", "Physical practice", "Team strategy discussion"],
+                correct: 1
+            },
+            {
+                question: "Which factor most affects an athlete's motivation?",
+                options: ["Prize money", "Personal goals", "Coach pressure", "Media attention"],
+                correct: 1
+            },
+            {
+                question: "How should athletes deal with failure or losses?",
+                options: ["Avoid analyzing mistakes", "Learn from the experience", "Blame external factors", "Quit the sport"],
+                correct: 1
+            }
+        ];
+
+        // Initialize the application
+        function init() {
+            renderSportsGrid();
+            populateLeaderboardSports();
+        }
+
+        // Render sports grid on landing page
+        function renderSportsGrid() {
+            const container = document.querySelector('.grid');
+            container.innerHTML = '';
+            
+            sportsData.forEach(sport => {
+                const card = document.createElement('div');
+                card.className = `sport-card ${sport.color} rounded-xl p-6 text-white text-center shadow-lg`;
+                card.innerHTML = `
+                    <div class="text-4xl mb-3">${sport.icon}</div>
+                    <h3 class="font-bold text-lg mb-2">${sport.name}</h3>
+                    <p class="text-sm opacity-90">${sport.description}</p>
+                `;
+                card.onclick = () => selectSport(sport);
+                container.appendChild(card);
+            });
+        }
+
+        // Select a sport and show analysis page
+        function selectSport(sport) {
+            currentSport = sport;
+            document.getElementById('selectedSportIcon').textContent = sport.icon;
+            document.getElementById('selectedSportName').textContent = sport.name;
+            
+            // Reset assessment scores
+            assessmentScores = { physical: null, mental: null, certificate: null };
+            updateProgress();
+            updateAssessmentStatus();
+            
+            // Hide landing page and show sport page
+            document.getElementById('landingPage').classList.add('hidden');
+            document.getElementById('sportPage').classList.remove('hidden');
+            document.getElementById('resultsSection').classList.add('hidden');
+        }
+
+        // Show landing page
+        function showLanding() {
+            document.getElementById('landingPage').classList.remove('hidden');
+            document.getElementById('sportPage').classList.add('hidden');
+        }
+
+        // Update progress bar
+        function updateProgress() {
+            const completed = Object.values(assessmentScores).filter(score => score !== null).length;
+            const progress = (completed / 3) * 100;
+            document.getElementById('progressBar').style.width = `${progress}%`;
+            
+            if (completed === 3) {
+                generateResults();
+            }
+        }
+
+        // Update assessment status indicators
+        function updateAssessmentStatus() {
+            document.getElementById('physicalStatus').textContent = 
+                assessmentScores.physical !== null ? `Completed: ${assessmentScores.physical}/100` : 'Not completed';
+            document.getElementById('mentalStatus').textContent = 
+                assessmentScores.mental !== null ? `Completed: ${assessmentScores.mental}/100` : 'Not completed';
+            document.getElementById('certificateStatus').textContent = 
+                assessmentScores.certificate !== null ? `Completed: ${assessmentScores.certificate}/100` : 'Not completed';
+        }
+
+        // Modal functions
+        function openVideoModal() {
+            document.getElementById('videoModal').classList.add('active');
+        }
+
+        function openMentalModal() {
+            document.getElementById('mentalModal').classList.add('active');
+            resetMentalTest();
+        }
+
+        function openCertificateModal() {
+            document.getElementById('certificateModal').classList.add('active');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        // Video upload and analysis
+        function handleVideoUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const video = document.getElementById('previewVideo');
+                video.src = URL.createObjectURL(file);
+                document.getElementById('videoPreview').classList.remove('hidden');
+            }
+        }
+
+        function startVideoCapture() {
+            // Simulate video capture functionality
+            alert('Video capture would be implemented using getUserMedia API for camera access');
+        }
+
+        function analyzeVideo() {
+            document.getElementById('videoAnalysis').classList.remove('hidden');
+            
+            // Simulate AI analysis
+            setTimeout(() => {
+                const mockResults = {
+                    speed: Math.floor(Math.random() * 40) + 60,
+                    stamina: Math.floor(Math.random() * 40) + 60,
+                    agility: Math.floor(Math.random() * 40) + 60,
+                    posture: Math.floor(Math.random() * 40) + 60,
+                    strength: Math.floor(Math.random() * 40) + 60
+                };
+                
+                const overallScore = Math.floor(Object.values(mockResults).reduce((a, b) => a + b) / 5);
+                assessmentScores.physical = overallScore;
+                
+                document.getElementById('videoAnalysis').innerHTML = `
+                    <div class="space-y-4">
+                        <h4 class="text-lg font-semibold text-green-600">Analysis Complete!</h4>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="bg-blue-50 p-3 rounded">
+                                <div class="text-sm text-gray-600">Speed</div>
+                                <div class="text-lg font-bold">${mockResults.speed}/100</div>
+                            </div>
+                            <div class="bg-green-50 p-3 rounded">
+                                <div class="text-sm text-gray-600">Stamina</div>
+                                <div class="text-lg font-bold">${mockResults.stamina}/100</div>
+                            </div>
+                            <div class="bg-purple-50 p-3 rounded">
+                                <div class="text-sm text-gray-600">Agility</div>
+                                <div class="text-lg font-bold">${mockResults.agility}/100</div>
+                            </div>
+                            <div class="bg-orange-50 p-3 rounded">
+                                <div class="text-sm text-gray-600">Posture</div>
+                                <div class="text-lg font-bold">${mockResults.posture}/100</div>
+                            </div>
+                            <div class="bg-red-50 p-3 rounded">
+                                <div class="text-sm text-gray-600">Strength</div>
+                                <div class="text-lg font-bold">${mockResults.strength}/100</div>
+                            </div>
+                            <div class="bg-yellow-50 p-3 rounded">
+                                <div class="text-sm text-gray-600">Overall</div>
+                                <div class="text-lg font-bold">${overallScore}/100</div>
+                            </div>
+                        </div>
+                        <button onclick="closeModal('videoModal')" class="w-full bg-green-600 text-white py-2 rounded-lg">
+                            Continue to Next Assessment
+                        </button>
+                    </div>
+                `;
+                
+                updateProgress();
+                updateAssessmentStatus();
+            }, 3000);
+        }
+
+        // Mental strength assessment
+        function resetMentalTest() {
+            document.getElementById('reactionTest').classList.remove('hidden');
+            document.getElementById('psychologyQuiz').classList.add('hidden');
+            document.getElementById('reactionButton').className = 'w-32 h-32 bg-red-500 rounded-full mx-auto cursor-pointer flex items-center justify-center text-white font-bold text-lg transition-colors';
+            document.getElementById('reactionButton').textContent = 'WAIT';
+            document.getElementById('reactionResult').textContent = '';
+            currentQuizQuestion = 0;
+            quizAnswers = [];
+        }
+
+        function startReactionTest() {
+            const button = document.getElementById('reactionButton');
+            const result = document.getElementById('reactionResult');
+            
+            button.className = 'w-32 h-32 bg-red-500 rounded-full mx-auto cursor-pointer flex items-center justify-center text-white font-bold text-lg transition-colors';
+            button.textContent = 'WAIT';
+            result.textContent = '';
+            
+            const delay = Math.random() * 3000 + 2000; // 2-5 seconds
+            
+            reactionTimeout = setTimeout(() => {
+                button.className = 'w-32 h-32 bg-green-500 rounded-full mx-auto cursor-pointer flex items-center justify-center text-white font-bold text-lg transition-colors';
+                button.textContent = 'CLICK!';
+                reactionStartTime = Date.now();
+            }, delay);
+        }
+
+        function handleReactionClick() {
+            const button = document.getElementById('reactionButton');
+            const result = document.getElementById('reactionResult');
+            
+            if (button.textContent === 'CLICK!' && reactionStartTime) {
+                const reactionTime = Date.now() - reactionStartTime;
+                const score = Math.max(0, 100 - Math.floor(reactionTime / 10)); // Better reaction = higher score
+                
+                result.innerHTML = `
+                    <div class="text-green-600">Reaction Time: ${reactionTime}ms</div>
+                    <div class="text-blue-600">Score: ${score}/100</div>
+                    <button onclick="startPsychologyQuiz()" class="mt-4 bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition-colors">
+                        Continue to Psychology Quiz
+                    </button>
+                `;
+                
+                // Store reaction score (40% weight)
+                window.reactionScore = score;
+                
+                clearTimeout(reactionTimeout);
+                reactionStartTime = null;
+            } else if (button.textContent === 'WAIT') {
+                result.innerHTML = '<div class="text-red-600">Too early! Wait for green.</div>';
+                clearTimeout(reactionTimeout);
+                setTimeout(() => {
+                    result.textContent = '';
+                }, 2000);
+            }
+        }
+
+        function startPsychologyQuiz() {
+            document.getElementById('reactionTest').classList.add('hidden');
+            document.getElementById('psychologyQuiz').classList.remove('hidden');
+            showQuizQuestion();
+        }
+
+        function showQuizQuestion() {
+            if (currentQuizQuestion >= quizQuestions.length) {
+                completeMentalAssessment();
+                return;
+            }
+            
+            const question = quizQuestions[currentQuizQuestion];
+            const quizContent = document.getElementById('quizContent');
+            
+            quizContent.innerHTML = `
+                <div class="space-y-4">
+                    <div class="text-center">
+                        <div class="text-sm text-gray-500">Question ${currentQuizQuestion + 1} of ${quizQuestions.length}</div>
+                        <h4 class="text-lg font-semibold mt-2">${question.question}</h4>
+                    </div>
+                    <div class="space-y-2">
+                        ${question.options.map((option, index) => `
+                            <button onclick="selectQuizAnswer(${index})" class="w-full text-left p-3 border border-gray-300 rounded-lg hover:bg-blue-50 transition-colors">
+                                ${String.fromCharCode(65 + index)}. ${option}
+                            </button>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function selectQuizAnswer(answerIndex) {
+            quizAnswers.push(answerIndex);
+            currentQuizQuestion++;
+            showQuizQuestion();
+        }
+
+        function completeMentalAssessment() {
+            const correctAnswers = quizAnswers.filter((answer, index) => answer === quizQuestions[index].correct).length;
+            const quizScore = Math.floor((correctAnswers / quizQuestions.length) * 100);
+            
+            // Calculate weighted mental score (40% reaction + 60% quiz)
+            const mentalScore = Math.floor((window.reactionScore * 0.4) + (quizScore * 0.6));
+            assessmentScores.mental = mentalScore;
+            
+            document.getElementById('quizContent').innerHTML = `
+                <div class="text-center space-y-4">
+                    <h4 class="text-lg font-semibold text-green-600">Mental Assessment Complete!</h4>
+                    <div class="space-y-2">
+                        <div>Reaction Score: ${window.reactionScore}/100 (40%)</div>
+                        <div>Quiz Score: ${quizScore}/100 (60%)</div>
+                        <div class="text-xl font-bold text-blue-600">Overall Mental Score: ${mentalScore}/100</div>
+                    </div>
+                    <button onclick="closeModal('mentalModal')" class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors">
+                        Continue to Next Assessment
+                    </button>
+                </div>
+            `;
+            
+            updateProgress();
+            updateAssessmentStatus();
+        }
+
+        // Certificate upload and verification
+        let uploadedFiles = [];
+        
+        function handleCertificateUpload(event) {
+            const files = Array.from(event.target.files);
+            processFiles(files);
+        }
+        
+        function processFiles(files) {
+            // Validate files
+            const validFiles = files.filter(file => {
+                const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf'];
+                const maxSize = 10 * 1024 * 1024; // 10MB
+                
+                if (!validTypes.includes(file.type)) {
+                    alert(`${file.name} is not a supported file type. Please use JPG, PNG, or PDF.`);
+                    return false;
+                }
+                
+                if (file.size > maxSize) {
+                    alert(`${file.name} is too large. Maximum file size is 10MB.`);
+                    return false;
+                }
+                
+                return true;
+            });
+            
+            // Add to uploaded files array
+            uploadedFiles = [...uploadedFiles, ...validFiles];
+            updateCertificatePreview();
+        }
+        
+        function updateCertificatePreview() {
+            const certificateList = document.getElementById('certificateList');
+            const fileCount = document.getElementById('fileCount');
+            
+            certificateList.innerHTML = '';
+            fileCount.textContent = `${uploadedFiles.length} file${uploadedFiles.length !== 1 ? 's' : ''}`;
+            
+            uploadedFiles.forEach((file, index) => {
+                const item = document.createElement('div');
+                item.className = 'flex items-center justify-between bg-white p-3 rounded-lg border shadow-sm';
+                
+                const fileIcon = file.type === 'application/pdf' ? '📄' : '🖼️';
+                const fileSize = (file.size / 1024 / 1024).toFixed(2);
+                
+                item.innerHTML = `
+                    <div class="flex items-center space-x-3">
+                        <span class="text-2xl">${fileIcon}</span>
+                        <div>
+                            <div class="text-sm font-medium text-gray-800">${file.name}</div>
+                            <div class="text-xs text-gray-500">${fileSize} MB • ${file.type.split('/')[1].toUpperCase()}</div>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button onclick="previewFile(${index})" class="text-blue-600 hover:text-blue-800 text-sm">👁️ Preview</button>
+                        <button onclick="removeFile(${index})" class="text-red-600 hover:text-red-800 text-sm">🗑️ Remove</button>
+                    </div>
+                `;
+                certificateList.appendChild(item);
+            });
+            
+            document.getElementById('certificatePreview').classList.remove('hidden');
+            updateScorePreview();
+            validateForm();
+        }
+        
+        function removeFile(index) {
+            uploadedFiles.splice(index, 1);
+            updateCertificatePreview();
+            
+            if (uploadedFiles.length === 0) {
+                document.getElementById('certificatePreview').classList.add('hidden');
+            }
+        }
+        
+        function previewFile(index) {
+            const file = uploadedFiles[index];
+            const url = URL.createObjectURL(file);
+            
+            if (file.type === 'application/pdf') {
+                window.open(url, '_blank');
+            } else {
+                // Create image preview modal
+                const modal = document.createElement('div');
+                modal.className = 'fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50';
+                modal.innerHTML = `
+                    <div class="max-w-4xl max-h-full p-4">
+                        <img src="${url}" class="max-w-full max-h-full object-contain rounded-lg">
+                        <button onclick="this.parentElement.parentElement.remove()" class="absolute top-4 right-4 text-white text-2xl bg-black bg-opacity-50 rounded-full w-10 h-10 flex items-center justify-center hover:bg-opacity-75">×</button>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+            }
+        }
+        
+        // Drag and drop functionality
+        function handleDragOver(event) {
+            event.preventDefault();
+            event.currentTarget.classList.add('border-green-500', 'bg-green-50');
+        }
+        
+        function handleDragLeave(event) {
+            event.currentTarget.classList.remove('border-green-500', 'bg-green-50');
+        }
+        
+        function handleDrop(event) {
+            event.preventDefault();
+            event.currentTarget.classList.remove('border-green-500', 'bg-green-50');
+            
+            const files = Array.from(event.dataTransfer.files);
+            processFiles(files);
+        }
+        
+        // Camera capture functionality
+        function captureWithCamera() {
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                // Create camera modal
+                const modal = document.createElement('div');
+                modal.className = 'fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50';
+                modal.innerHTML = `
+                    <div class="bg-white rounded-lg p-6 max-w-2xl w-full mx-4">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-semibold">Capture Certificate</h3>
+                            <button onclick="stopCamera(); this.closest('.fixed').remove()" class="text-gray-500 hover:text-gray-700 text-2xl">×</button>
+                        </div>
+                        <video id="cameraVideo" autoplay class="w-full rounded-lg mb-4"></video>
+                        <canvas id="cameraCanvas" class="hidden"></canvas>
+                        <div class="flex space-x-4">
+                            <button onclick="capturePhoto()" class="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700">📷 Capture</button>
+                            <button onclick="stopCamera(); this.closest('.fixed').remove()" class="flex-1 bg-gray-600 text-white py-2 rounded-lg hover:bg-gray-700">Cancel</button>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+                
+                // Start camera
+                navigator.mediaDevices.getUserMedia({ video: true })
+                    .then(stream => {
+                        const video = document.getElementById('cameraVideo');
+                        video.srcObject = stream;
+                        window.currentStream = stream;
+                    })
+                    .catch(err => {
+                        alert('Camera access denied or not available');
+                        modal.remove();
+                    });
+            } else {
+                alert('Camera not supported in this browser');
+            }
+        }
+        
+        function capturePhoto() {
+            const video = document.getElementById('cameraVideo');
+            const canvas = document.getElementById('cameraCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            ctx.drawImage(video, 0, 0);
+            
+            canvas.toBlob(blob => {
+                const file = new File([blob], `certificate_${Date.now()}.jpg`, { type: 'image/jpeg' });
+                uploadedFiles.push(file);
+                updateCertificatePreview();
+                
+                stopCamera();
+                document.querySelector('.fixed').remove();
+            }, 'image/jpeg', 0.8);
+        }
+        
+        function stopCamera() {
+            if (window.currentStream) {
+                window.currentStream.getTracks().forEach(track => track.stop());
+                window.currentStream = null;
+            }
+        }
+        
+        // Quick template functionality
+        function setQuickTemplate(level) {
+            document.getElementById('certificateLevel').value = level;
+            updateScorePreview();
+        }
+        
+        // Score preview functionality
+        function updateScorePreview() {
+            const level = document.getElementById('certificateLevel').value;
+            const position = document.getElementById('certificatePosition').value;
+            const fileCount = uploadedFiles.length;
+            
+            if (!level || fileCount === 0) {
+                return;
+            }
+            
+            let baseScore = 0;
+            switch(level) {
+                case 'national': baseScore = 100; break;
+                case 'state': baseScore = 70; break;
+                case 'division': baseScore = 50; break;
+                case 'district': baseScore = 30; break;
+            }
+            
+            let positionBonus = 0;
+            switch(position) {
+                case '1st': positionBonus = baseScore * 0.10; break;
+                case '2nd': positionBonus = baseScore * 0.07; break;
+                case '3rd': positionBonus = baseScore * 0.05; break;
+            }
+            
+            const multipleBonus = fileCount > 1 ? baseScore * 0.10 : 0;
+            const totalScore = Math.min(100, baseScore + positionBonus + multipleBonus);
+            
+            const scoreBreakdown = document.getElementById('scoreBreakdown');
+            scoreBreakdown.innerHTML = `
+                <div class="flex justify-between"><span>Base Score (${level}):</span><span>${baseScore} pts</span></div>
+                ${positionBonus > 0 ? `<div class="flex justify-between text-green-600"><span>Position Bonus:</span><span>+${Math.floor(positionBonus)} pts</span></div>` : ''}
+                ${multipleBonus > 0 ? `<div class="flex justify-between text-green-600"><span>Multiple Certificates:</span><span>+${Math.floor(multipleBonus)} pts</span></div>` : ''}
+                <div class="flex justify-between font-semibold border-t pt-1 mt-1"><span>Total Score:</span><span>${Math.floor(totalScore)}/100</span></div>
+            `;
+        }
+        
+        // Form validation
+        function validateForm() {
+            const level = document.getElementById('certificateLevel').value;
+            const org = document.getElementById('certificateOrg').value;
+            const verifyBtn = document.getElementById('verifyBtn');
+            
+            const isValid = level && org && uploadedFiles.length > 0;
+            verifyBtn.disabled = !isValid;
+        }
+        
+        // Populate certificate sport dropdown
+        function populateCertificateSports() {
+            const select = document.getElementById('certificateSport');
+            sportsData.forEach(sport => {
+                const option = document.createElement('option');
+                option.value = sport.name.toLowerCase();
+                option.textContent = `${sport.icon} ${sport.name}`;
+                select.appendChild(option);
+            });
+        }
+        
+        // Add event listeners for form validation
+        document.addEventListener('DOMContentLoaded', function() {
+            populateCertificateSports();
+            
+            ['certificateLevel', 'certificatePosition', 'certificateOrg'].forEach(id => {
+                document.getElementById(id).addEventListener('change', () => {
+                    updateScorePreview();
+                    validateForm();
+                });
+            });
+        });
+
+        function verifyCertificates() {
+            const level = document.getElementById('certificateLevel').value;
+            const position = document.getElementById('certificatePosition').value;
+            const year = document.getElementById('certificateYear').value;
+            const org = document.getElementById('certificateOrg').value;
+            const sport = document.getElementById('certificateSport').value;
+            
+            if (!level || !year || !org || uploadedFiles.length === 0) {
+                alert('Please fill all required fields (Level, Year, Organization) and upload at least one certificate.');
+                return;
+            }
+            
+            // Show processing status
+            document.getElementById('processingStatus').classList.remove('hidden');
+            document.getElementById('verifyBtn').disabled = true;
+            
+            // Simulate OCR and verification process
+            setTimeout(() => {
+                let baseScore = 0;
+                let levelName = '';
+                switch(level) {
+                    case 'national': 
+                        baseScore = 100; 
+                        levelName = 'National';
+                        break;
+                    case 'state': 
+                        baseScore = 70; 
+                        levelName = 'State';
+                        break;
+                    case 'division': 
+                        baseScore = 50; 
+                        levelName = 'Division';
+                        break;
+                    case 'district': 
+                        baseScore = 30; 
+                        levelName = 'District';
+                        break;
+                }
+                
+                // Calculate position bonus
+                let positionBonus = 0;
+                let positionName = '';
+                switch(position) {
+                    case '1st': 
+                        positionBonus = Math.floor(baseScore * 0.10); 
+                        positionName = '1st Place';
+                        break;
+                    case '2nd': 
+                        positionBonus = Math.floor(baseScore * 0.07); 
+                        positionName = '2nd Place';
+                        break;
+                    case '3rd': 
+                        positionBonus = Math.floor(baseScore * 0.05); 
+                        positionName = '3rd Place';
+                        break;
+                    default:
+                        positionName = 'Participation';
+                        break;
+                }
+                
+                // Add 10% bonus for multiple certificates
+                const multipleBonus = uploadedFiles.length > 1 ? Math.floor(baseScore * 0.1) : 0;
+                const finalScore = Math.min(100, baseScore + positionBonus + multipleBonus);
+                
+                // Store certificate data for report
+                window.certificateData = {
+                    level: levelName,
+                    position: positionName,
+                    year: year,
+                    organization: org,
+                    sport: sport,
+                    filesCount: uploadedFiles.length,
+                    baseScore: baseScore,
+                    positionBonus: positionBonus,
+                    multipleBonus: multipleBonus,
+                    finalScore: finalScore
+                };
+                
+                assessmentScores.certificate = finalScore;
+                
+                // Hide processing and show results
+                document.getElementById('processingStatus').classList.add('hidden');
+                
+                document.getElementById('certificatePreview').innerHTML = `
+                    <div class="text-center space-y-6">
+                        <div class="bg-green-50 p-6 rounded-lg border border-green-200">
+                            <div class="text-4xl mb-3">✅</div>
+                            <h4 class="text-xl font-semibold text-green-700 mb-2">Certificates Successfully Verified!</h4>
+                            <p class="text-sm text-green-600">OCR processing and authenticity verification completed</p>
+                        </div>
+                        
+                        <div class="bg-white p-6 rounded-lg border space-y-4">
+                            <h5 class="font-semibold text-gray-800">Verification Summary</h5>
+                            <div class="grid grid-cols-2 gap-4 text-sm">
+                                <div class="bg-gray-50 p-3 rounded">
+                                    <div class="text-gray-600">Competition Level</div>
+                                    <div class="font-semibold">${levelName}</div>
+                                </div>
+                                <div class="bg-gray-50 p-3 rounded">
+                                    <div class="text-gray-600">Files Processed</div>
+                                    <div class="font-semibold">${uploadedFiles.length} certificate${uploadedFiles.length !== 1 ? 's' : ''}</div>
+                                </div>
+                                <div class="bg-gray-50 p-3 rounded">
+                                    <div class="text-gray-600">Organization</div>
+                                    <div class="font-semibold">${org}</div>
+                                </div>
+                                <div class="bg-gray-50 p-3 rounded">
+                                    <div class="text-gray-600">Year</div>
+                                    <div class="font-semibold">${year}</div>
+                                </div>
+                                ${position ? `
+                                <div class="bg-gray-50 p-3 rounded">
+                                    <div class="text-gray-600">Position</div>
+                                    <div class="font-semibold">${positionName}</div>
+                                </div>` : ''}
+                                ${sport ? `
+                                <div class="bg-gray-50 p-3 rounded">
+                                    <div class="text-gray-600">Sport Category</div>
+                                    <div class="font-semibold">${sport.charAt(0).toUpperCase() + sport.slice(1)}</div>
+                                </div>` : ''}
+                            </div>
+                        </div>
+                        
+                        <div class="bg-blue-50 p-6 rounded-lg border border-blue-200">
+                            <h5 class="font-semibold text-blue-800 mb-3">Score Breakdown</h5>
+                            <div class="space-y-2 text-sm">
+                                <div class="flex justify-between">
+                                    <span>Base Score (${levelName}):</span>
+                                    <span class="font-semibold">${baseScore} pts</span>
+                                </div>
+                                ${positionBonus > 0 ? `
+                                <div class="flex justify-between text-green-600">
+                                    <span>Position Bonus (${positionName}):</span>
+                                    <span class="font-semibold">+${positionBonus} pts</span>
+                                </div>` : ''}
+                                ${multipleBonus > 0 ? `
+                                <div class="flex justify-between text-green-600">
+                                    <span>Multiple Certificates Bonus:</span>
+                                    <span class="font-semibold">+${multipleBonus} pts</span>
+                                </div>` : ''}
+                                <div class="border-t pt-2 mt-2">
+                                    <div class="flex justify-between text-lg font-bold text-blue-600">
+                                        <span>Final Certificate Score:</span>
+                                        <span>${finalScore}/100</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex space-x-4">
+                            <button onclick="addMoreCertificates()" class="flex-1 bg-gray-600 text-white py-3 rounded-lg hover:bg-gray-700 transition-colors">
+                                📄 Add More Certificates
+                            </button>
+                            <button onclick="closeModal('certificateModal')" class="flex-1 bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition-colors">
+                                ✅ Complete Assessment
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                updateProgress();
+                updateAssessmentStatus();
+            }, 2000);
+        }
+        
+        function addMoreCertificates() {
+            // Reset the form for adding more certificates
+            uploadedFiles = [];
+            document.getElementById('certificateFile').value = '';
+            document.getElementById('certificateLevel').value = '';
+            document.getElementById('certificatePosition').value = '';
+            document.getElementById('certificateOrg').value = '';
+            document.getElementById('certificateSport').value = '';
+            document.getElementById('certificatePreview').classList.add('hidden');
+        }
+
+        // Generate final results
+        function generateResults() {
+            const physical = assessmentScores.physical || 0;
+            const mental = assessmentScores.mental || 0;
+            const certificate = assessmentScores.certificate || 0;
+            
+            // Calculate composite score: 45% physical + 35% mental + 20% certificate
+            const composite = Math.floor((physical * 0.45) + (mental * 0.35) + (certificate * 0.20));
+            
+            // Determine talent category
+            let category = '';
+            let categoryColor = '';
+            if (composite >= 85) {
+                category = 'Elite';
+                categoryColor = 'text-purple-600';
+            } else if (composite >= 70) {
+                category = 'Advanced';
+                categoryColor = 'text-blue-600';
+            } else if (composite >= 55) {
+                category = 'Emerging';
+                categoryColor = 'text-green-600';
+            } else {
+                category = 'Development';
+                categoryColor = 'text-orange-600';
+            }
+            
+            // Get certificate data if available
+            const certData = window.certificateData || {};
+            
+            const resultsContent = document.getElementById('resultsContent');
+            resultsContent.innerHTML = `
+                <div class="space-y-6">
+                    <div class="text-center">
+                        <div class="text-6xl mb-4">${currentSport.icon}</div>
+                        <h4 class="text-2xl font-bold text-gray-800">${currentSport.name} Analysis Complete</h4>
+                        <div class="text-4xl font-bold ${categoryColor} mt-2">${composite}/100</div>
+                        <div class="text-xl ${categoryColor} font-semibold">${category} Talent</div>
+                    </div>
+                    
+                    <div class="grid md:grid-cols-3 gap-6">
+                        <div class="bg-blue-50 p-4 rounded-lg text-center">
+                            <div class="text-2xl font-bold text-blue-600">${physical}/100</div>
+                            <div class="text-sm text-gray-600">Physical Analysis (45%)</div>
+                        </div>
+                        <div class="bg-purple-50 p-4 rounded-lg text-center">
+                            <div class="text-2xl font-bold text-purple-600">${mental}/100</div>
+                            <div class="text-sm text-gray-600">Mental Strength (35%)</div>
+                        </div>
+                        <div class="bg-green-50 p-4 rounded-lg text-center">
+                            <div class="text-2xl font-bold text-green-600">${certificate}/100</div>
+                            <div class="text-sm text-gray-600">Certificates (20%)</div>
+                        </div>
+                    </div>
+                    
+                    ${certificate > 0 && certData.level ? `
+                    <div class="bg-white p-6 rounded-lg border shadow-sm">
+                        <h5 class="font-semibold text-gray-800 mb-4 flex items-center">
+                            <span class="text-2xl mr-2">🏅</span>
+                            Certificate Analysis Details
+                        </h5>
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div class="space-y-3">
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Competition Level:</span>
+                                    <span class="font-semibold">${certData.level}</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Position/Rank:</span>
+                                    <span class="font-semibold">${certData.position}</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Year:</span>
+                                    <span class="font-semibold">${certData.year}</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Organization:</span>
+                                    <span class="font-semibold text-sm">${certData.organization}</span>
+                                </div>
+                                ${certData.sport ? `
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Sport Category:</span>
+                                    <span class="font-semibold">${certData.sport.charAt(0).toUpperCase() + certData.sport.slice(1)}</span>
+                                </div>` : ''}
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Files Uploaded:</span>
+                                    <span class="font-semibold">${certData.filesCount} certificate${certData.filesCount !== 1 ? 's' : ''}</span>
+                                </div>
+                            </div>
+                            <div class="bg-blue-50 p-4 rounded-lg">
+                                <h6 class="font-semibold text-blue-800 mb-3">Score Calculation</h6>
+                                <div class="space-y-2 text-sm">
+                                    <div class="flex justify-between">
+                                        <span>Base Score (${certData.level}):</span>
+                                        <span class="font-semibold">${certData.baseScore} pts</span>
+                                    </div>
+                                    ${certData.positionBonus > 0 ? `
+                                    <div class="flex justify-between text-green-600">
+                                        <span>Position Bonus:</span>
+                                        <span class="font-semibold">+${certData.positionBonus} pts</span>
+                                    </div>` : ''}
+                                    ${certData.multipleBonus > 0 ? `
+                                    <div class="flex justify-between text-green-600">
+                                        <span>Multiple Certificates:</span>
+                                        <span class="font-semibold">+${certData.multipleBonus} pts</span>
+                                    </div>` : ''}
+                                    <div class="border-t pt-2 mt-2">
+                                        <div class="flex justify-between font-bold text-blue-600">
+                                            <span>Total Certificate Score:</span>
+                                            <span>${certData.finalScore}/100</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>` : ''}
+                    
+                    <div class="bg-gray-50 p-6 rounded-lg">
+                        <h5 class="font-semibold text-gray-800 mb-3">Recommendations</h5>
+                        <ul class="space-y-2 text-sm text-gray-600">
+                            ${physical < 70 ? '<li>• Focus on improving physical conditioning and technique</li>' : ''}
+                            ${mental < 70 ? '<li>• Work on mental training and sports psychology</li>' : ''}
+                            ${certificate < 50 ? '<li>• Participate in more competitions to earn certificates</li>' : ''}
+                            <li>• Continue regular training and seek professional coaching</li>
+                            <li>• Join local sports clubs and training programs</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="flex space-x-4">
+                        <button onclick="saveReport()" class="flex-1 bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors">
+                            Save Report
+                        </button>
+                        <button onclick="shareReport()" class="flex-1 bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors">
+                            Share Results
+                        </button>
+                        <button onclick="viewLeaderboard()" class="flex-1 bg-purple-600 text-white py-3 rounded-lg font-semibold hover:bg-purple-700 transition-colors">
+                            View Leaderboard
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('resultsSection').classList.remove('hidden');
+            
+            // Simulate saving to cloud/database
+            saveToCloud({
+                sport: currentSport.name,
+                scores: assessmentScores,
+                composite: composite,
+                category: category,
+                certificateData: certData,
+                timestamp: new Date().toISOString()
+            });
+        }
+
+        // Save report functionality
+        function saveReport() {
+            alert('Report saved to your profile! You can access it anytime from your dashboard.');
+        }
+
+        function shareReport() {
+            if (navigator.share) {
+                navigator.share({
+                    title: `My ${currentSport.name} Talent Analysis`,
+                    text: `I scored ${Math.floor((assessmentScores.physical * 0.45) + (assessmentScores.mental * 0.35) + (assessmentScores.certificate * 0.20))}/100 in ${currentSport.name} on SportsTalent India!`,
+                    url: window.location.href
+                });
+            } else {
+                // Fallback for browsers that don't support Web Share API
+                const text = `I scored ${Math.floor((assessmentScores.physical * 0.45) + (assessmentScores.mental * 0.35) + (assessmentScores.certificate * 0.20))}/100 in ${currentSport.name} on SportsTalent India!`;
+                navigator.clipboard.writeText(text).then(() => {
+                    alert('Results copied to clipboard!');
+                });
+            }
+        }
+
+        // Leaderboard functionality
+        function populateLeaderboardSports() {
+            const select = document.getElementById('leaderboardSport');
+            sportsData.forEach(sport => {
+                const option = document.createElement('option');
+                option.value = sport.name.toLowerCase();
+                option.textContent = sport.name;
+                select.appendChild(option);
+            });
+        }
+
+        function viewLeaderboard() {
+            document.getElementById('leaderboardModal').classList.add('active');
+            updateLeaderboard();
+        }
+
+        function updateLeaderboard() {
+            const sport = document.getElementById('leaderboardSport').value;
+            const region = document.getElementById('leaderboardRegion').value;
+            
+            // Generate mock leaderboard data
+            const mockData = generateMockLeaderboard(sport, region);
+            
+            const content = document.getElementById('leaderboardContent');
+            content.innerHTML = `
+                <div class="space-y-4">
+                    <h4 class="text-lg font-semibold text-gray-800">
+                        ${sport === 'all' ? 'All Sports' : sport.charAt(0).toUpperCase() + sport.slice(1)} - ${region.charAt(0).toUpperCase() + region.slice(1)} Rankings
+                    </h4>
+                    ${mockData.map((entry, index) => `
+                        <div class="leaderboard-item flex items-center justify-between bg-white p-4 rounded-lg shadow border-l-4 ${index < 3 ? 'border-yellow-500' : 'border-gray-300'}">
+                            <div class="flex items-center space-x-4">
+                                <div class="text-2xl font-bold ${index === 0 ? 'text-yellow-500' : index === 1 ? 'text-gray-400' : index === 2 ? 'text-amber-600' : 'text-gray-600'}">
+                                    ${index + 1}
+                                </div>
+                                <div>
+                                    <div class="font-semibold text-gray-800">${entry.name}</div>
+                                    <div class="text-sm text-gray-600">${entry.location}</div>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-xl font-bold text-blue-600">${entry.score}/100</div>
+                                <div class="text-sm text-gray-500">${entry.category}</div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function generateMockLeaderboard(sport, region) {
+            const names = ['Arjun Sharma', 'Priya Patel', 'Rahul Kumar', 'Sneha Singh', 'Vikram Reddy', 'Anita Gupta', 'Rohit Verma', 'Kavya Nair'];
+            const locations = ['Mumbai, Maharashtra', 'Delhi, Delhi', 'Bangalore, Karnataka', 'Chennai, Tamil Nadu', 'Kolkata, West Bengal', 'Pune, Maharashtra', 'Hyderabad, Telangana', 'Ahmedabad, Gujarat'];
+            const categories = ['Elite', 'Advanced', 'Emerging', 'Development'];
+            
+            return Array.from({length: 8}, (_, i) => ({
+                name: names[i],
+                location: locations[i],
+                score: Math.floor(Math.random() * 30) + 70 - (i * 2),
+                category: categories[Math.floor(Math.random() * categories.length)]
+            })).sort((a, b) => b.score - a.score);
+        }
+
+        // Cloud storage simulation
+        function saveToCloud(data) {
+            // Simulate API call to save data
+            console.log('Saving to cloud:', data);
+            
+            // In a real implementation, this would be:
+            // fetch('/api/reports/generate', {
+            //     method: 'POST',
+            //     headers: { 'Content-Type': 'application/json' },
+            //     body: JSON.stringify(data)
+            // });
+        }
+
+        // New functions for first page buttons
+        function viewMyReports() {
+            alert('My Reports feature would show your saved assessment reports and progress over time.');
+        }
+        
+        function shareApp() {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'SportsTalent India - AI Sports Analysis',
+                    text: 'Discover your sports talent with AI-powered analysis! Test your physical skills, mental strength, and showcase certificates.',
+                    url: window.location.href
+                });
+            } else {
+                const text = 'Check out SportsTalent India - AI-powered sports talent discovery platform! ' + window.location.href;
+                navigator.clipboard.writeText(text).then(() => {
+                    alert('App link copied to clipboard! Share it with friends and family.');
+                });
+            }
+        }
+
+        // Initialize the application when page loads
+        document.addEventListener('DOMContentLoaded', init);
+
+        // Close modals when clicking outside
+        window.onclick = function(event) {
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(modal => {
+                if (event.target === modal) {
+                    modal.classList.remove('active');
+                }
+            });
+        }
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9801731f677ec203',t:'MTc1ODAzNzA5NC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
